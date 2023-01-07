@@ -3,7 +3,7 @@ import { dehydrate, QueryClient, useQuery } from '@tanstack/react-query';
 import { GetServerSideProps } from 'next';
 import { prisma } from '../server/prisma';
 
-export default function Home({ dehydratedState }: any) {
+export default function Home() {
   const { data: dummies } = useQuery({
     queryKey: ['dummies'],
     queryFn: async () => (await (await fetch('/api/dummies')).json()) as Dummy[]
