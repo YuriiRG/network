@@ -9,7 +9,7 @@ export default function Home() {
     queryFn: async () => (await (await fetch('/api/dummies')).json()) as Dummy[]
   });
   return (
-    <article className='prose m-4 mt-10 max-w-prose'>
+    <article className='prose m-4 mt-10'>
       <h1>Hello, World!</h1>
       <p>
         Lorem ipsum dolor sit amet consectetur, adipisicing elit. Quos rem
@@ -17,13 +17,13 @@ export default function Home() {
         laboriosam enim labore nobis distinctio porro, voluptates repellat
         similique dolores, dolore deleniti.
       </p>
-      <ul>
+      <ol>
         {dummies?.map((dummy) => (
           <li key={dummy.id}>
             id: {dummy.id}; data: {dummy.data}
           </li>
         ))}
-      </ul>
+      </ol>
     </article>
   );
 }
