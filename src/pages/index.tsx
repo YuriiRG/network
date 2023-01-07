@@ -17,13 +17,13 @@ export default function Home() {
         laboriosam enim labore nobis distinctio porro, voluptates repellat
         similique dolores, dolore deleniti.
       </p>
-      <ul>
+      <ol>
         {dummies?.map((dummy) => (
           <li key={dummy.id}>
             id: {dummy.id}; data: {dummy.data}
           </li>
         ))}
-      </ul>
+      </ol>
     </article>
   );
 }
