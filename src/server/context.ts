@@ -11,7 +11,7 @@ type CreateInnerContextOptions = {
  *
  * Also useful for:
  * - testing, so you don't have to mock Next.js' `req`/`res`
- * - tRPC's `createSSGHelpers` where we don't have `req`/`res`
+ * - tRPC's `createSSGHelpers` where we don't have Next API `req`/`res` (not getServerSideProps ones)
  *
  * @see https://trpc.io/docs/context#inner-and-outer-context
  */
