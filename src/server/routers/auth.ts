@@ -1,6 +1,6 @@
 import { router, procedure } from '../trpc';
 
-export const userRouter = router({
+export const authRouter = router({
   all: procedure.query(async ({ ctx }) => {
     return await ctx.prisma.user.findMany();
   })

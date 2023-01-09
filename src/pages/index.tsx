@@ -4,9 +4,10 @@ import { appRouter } from '../server/routers/_app';
 import { createProxySSGHelpers } from '@trpc/react-query/ssg';
 import { createContextInner } from '../server/context';
 import superjson from 'superjson';
+import { createSSRHelpers } from '../server/ssr-helpers';
 
 export default function Home() {
-  const { data } = trpc.user.all.useQuery();
+  const { data } = trpc.auth.all.useQuery();
   if (!data) {
     return <div>no prefetched data</div>;
   }
@@ -29,15 +30,9 @@ export default function Home() {
 }
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
-  const ssr = createProxySSGHelpers({
-    router: appRouter,
-    ctx: await createContextInner({
-      userAgent: context.req.headers['user-agent']
-    }),
-    transformer: superjson
-  });
+  const ssr = await createSSRHelpers(context);
 
-  await ssr.user.all.prefetch();
+  await ssr.auth.all.prefetch();
 
   return {
     props: {
