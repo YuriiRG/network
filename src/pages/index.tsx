@@ -1,13 +1,4 @@
-import { Dummy } from '@prisma/client';
-import { dehydrate, QueryClient, useQuery } from '@tanstack/react-query';
-import { GetServerSideProps } from 'next';
-import { prisma } from '../server/prisma';
-
 export default function Home() {
-  const { data: dummies } = useQuery({
-    queryKey: ['dummies'],
-    queryFn: async () => (await (await fetch('/api/dummies')).json()) as Dummy[]
-  });
   return (
     <article className='prose m-4 mt-10'>
       <h1>Hello, World!</h1>
@@ -17,32 +8,6 @@ export default function Home() {
         laboriosam enim labore nobis distinctio porro, voluptates repellat
         similique dolores, dolore deleniti.
       </p>
-      <ol>
-        {dummies?.map((dummy) => (
-          <li key={dummy.id}>
-            id: {dummy.id}; data: {dummy.data}
-          </li>
-        ))}
-      </ol>
     </article>
   );
 }
-
-export const getServerSideProps: GetServerSideProps = async (context) => {
-  const queryClient = new QueryClient();
-
-  await prisma.dummy.create({
-    data: {
-      data: context.req.headers['user-agent']
-    }
-  });
-
-  const dummies = await prisma.dummy.findMany();
-
-  await queryClient.prefetchQuery(['dummies'], () => dummies);
-  return {
-    props: {
-      dehydratedState: dehydrate(queryClient)
-    }
-  };
-};
