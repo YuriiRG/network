@@ -4,7 +4,7 @@ import { appRouter } from '../server/routers/_app';
 import { createProxySSGHelpers } from '@trpc/react-query/ssg';
 import { createContextInner } from '../server/context';
 import superjson from 'superjson';
-import { createSSRHelpers } from '../server/ssr-helpers';
+import { createSSRHelpers } from '../server/helpers/ssr';
 
 export default function Home() {
   const { data } = trpc.auth.all.useQuery();

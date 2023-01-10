@@ -3,7 +3,7 @@ import { CreateNextContextOptions } from '@trpc/server/adapters/next';
 import { prisma } from './db';
 
 type CreateInnerContextOptions = {
-  userAgent?: string;
+  sessionId?: string;
 };
 
 /**
@@ -18,7 +18,11 @@ type CreateInnerContextOptions = {
 export async function createContextInner(opts: CreateInnerContextOptions) {
   return {
     prisma,
-    userAgent: opts.userAgent
+    session: await prisma.session.findFirst({
+      where: {
+        id: opts.sessionId
+      }
+    })
   };
 }
 /**
@@ -28,8 +32,20 @@ export async function createContextInner(opts: CreateInnerContextOptions) {
  */
 export async function createContext(opts: CreateNextContextOptions) {
   const contextInner = await createContextInner({
-    userAgent: opts.req.headers['user-agent']
+    sessionId: opts.req.cookies.sessionId
   });
-  return contextInner;
+  return {
+    ...contextInner,
+    req: opts.req,
+    res: opts.res
+  };
 }
-export type Context = inferAsyncReturnType<typeof createContextInner>;
+
+export type InnerContext = inferAsyncReturnType<typeof createContextInner>;
+
+export type OuterContext = Omit<
+  inferAsyncReturnType<typeof createContext>,
+  keyof InnerContext
+>;
+
+export type Context = InnerContext & Partial<OuterContext>;
