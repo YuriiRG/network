@@ -1,3 +1,4 @@
+import { Session } from '@prisma/client';
 import { inferAsyncReturnType } from '@trpc/server';
 import { CreateNextContextOptions } from '@trpc/server/adapters/next';
 import { prisma } from './db';
@@ -18,11 +19,16 @@ type CreateInnerContextOptions = {
 export async function createContextInner(opts: CreateInnerContextOptions) {
   return {
     prisma,
-    session: await prisma.session.findFirst({
-      where: {
-        id: opts.sessionId
-      }
-    })
+    session: opts.sessionId
+      ? await prisma.session.findFirst({
+          where: {
+            id: opts.sessionId
+          },
+          include: {
+            user: true
+          }
+        })
+      : null
   };
 }
 /**

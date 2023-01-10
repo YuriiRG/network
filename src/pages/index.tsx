@@ -1,23 +1,51 @@
+import { GetServerSidePropsContext } from 'next';
+import { createSSRHelpers } from '../server/helpers/ssr';
 import { api } from '../utils/api';
 
 export default function Home() {
-  const { data: users } = api.user.all.useQuery();
-  if (!users) return <div>no prefetched data</div>;
+  const utils = api.useContext();
+  const signUp = api.auth.signUp.useMutation({
+    onSuccess: () => {
+      utils.user.all.invalidate();
+    }
+  });
+  const signIn = api.auth.signIn.useMutation({
+    onSuccess: () => {
+      utils.auth.getUser.invalidate();
+    }
+  });
+  const { data } = api.auth.getUser.useQuery();
 
   return (
-    <>
-      <article className='prose m-4 mt-10'>
-        <h1>Hello, World!</h1>
-        <p>
-          Lorem ipsum dolor sit amet consectetur, adipisicing elit. Quos rem
-          consectetur maxime voluptas nostrum, libero perferendis sapiente ipsam
-          laboriosam enim labore nobis distinctio porro, voluptates repellat
-          similique dolores, dolore deleniti.
-        </p>
-      </article>
-      {users.map((user) => (
-        <pre key={user.id}>{JSON.stringify(user, null, 2)}</pre>
-      ))}
-    </>
+    <div className='p-4'>
+      {data && <pre>{JSON.stringify(data, null, 2)}</pre>}
+      <button
+        className='rounded bg-gray-300 p-2'
+        onClick={() => signIn.mutate({ name: 'JohnDoe', password: '12345678' })}
+      >
+        Sign In
+      </button>
+      <button
+        className='rounded bg-gray-300 p-2'
+        onClick={() =>
+          signUp.mutate({ name: 'JohnDoe3', password: '12345678' })
+        }
+      >
+        Sign Up
+      </button>
+      {signUp.isLoading && 'signing up'}
+      {signUp.isError && <div>An error occurred: {signUp.error.message}</div>}
+      {signUp.isSuccess && <div>Success</div>}
+    </div>
   );
+}
+
+export async function getServerSideProps(context: GetServerSidePropsContext) {
+  const ssr = await createSSRHelpers(context);
+  await ssr.auth.getUser.prefetch();
+  return {
+    props: {
+      trpcState: ssr.dehydrate()
+    }
+  };
 }
