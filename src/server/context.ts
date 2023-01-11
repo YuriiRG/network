@@ -1,10 +1,13 @@
-import { Session } from '@prisma/client';
+import { Session, User } from '@prisma/client';
 import { inferAsyncReturnType } from '@trpc/server';
 import { CreateNextContextOptions } from '@trpc/server/adapters/next';
+import { getClientIp } from 'request-ip';
 import { prisma } from './db';
 
 type CreateInnerContextOptions = {
   sessionId?: string;
+  ipAddress: string | null;
+  userAgent: string | null;
 };
 
 /**
@@ -17,19 +20,35 @@ type CreateInnerContextOptions = {
  * @see https://trpc.io/docs/context#inner-and-outer-context
  */
 export async function createContextInner(opts: CreateInnerContextOptions) {
-  return {
-    prisma,
-    session: opts.sessionId
-      ? await prisma.session.findFirst({
-          where: {
-            id: opts.sessionId
-          },
-          include: {
-            user: true
-          }
-        })
-      : null
-  };
+  let session: (Session & { user: User }) | null = null;
+
+  if (!opts.sessionId) {
+    return {
+      prisma,
+      session
+    };
+  }
+
+  try {
+    session = await prisma.session.update({
+      where: {
+        id: opts.sessionId
+      },
+      data: {
+        lastActivity: new Date(),
+        userAgent: opts.userAgent,
+        ipAddress: opts.ipAddress
+      },
+      include: {
+        user: true
+      }
+    });
+  } finally {
+    return {
+      prisma,
+      session
+    };
+  }
 }
 /**
  * Outer context. Used in the routers and will e.g. bring `req` & `res` to the context as "not `undefined`".
@@ -38,7 +57,9 @@ export async function createContextInner(opts: CreateInnerContextOptions) {
  */
 export async function createContext(opts: CreateNextContextOptions) {
   const contextInner = await createContextInner({
-    sessionId: opts.req.cookies.sessionId
+    sessionId: opts.req.cookies.sessionId,
+    ipAddress: getClientIp(opts.req),
+    userAgent: opts.req.headers['user-agent'] ?? null
   });
   return {
     ...contextInner,

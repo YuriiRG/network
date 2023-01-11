@@ -62,7 +62,7 @@ export const authRouter = router({
         );
       }
     }),
-  getUser: procedure.query(({ ctx }) => {
-    return ctx.session ? ctx.session.user : null;
+  getUser: procedure.query(async ({ ctx }) => {
+    return ctx.session?.user ?? null;
   })
 });

@@ -1,3 +1,4 @@
+import { Mutation } from '@tanstack/react-query';
 import { GetServerSidePropsContext } from 'next';
 import { createSSRHelpers } from '../server/helpers/ssr';
 import { api } from '../utils/api';
