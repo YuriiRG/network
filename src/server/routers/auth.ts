@@ -35,14 +35,10 @@ export const authRouter = router({
         }
       });
       if (!user) {
-        throw new TRPCError({
-          code: 'NOT_FOUND'
-        });
+        return false;
       }
       if (!(await bcrypt.compare(input.password, user.passwordHash))) {
-        throw new TRPCError({
-          code: 'UNAUTHORIZED'
-        });
+        return false;
       }
       if (ctx.res && ctx.req) {
         const session = await ctx.prisma.session.create({
@@ -57,9 +53,10 @@ export const authRouter = router({
           `sessionId=${
             session.id
           }; Secure; HttpOnly; SameSite=Lax; Path=/; Max-Age=${
-            60 * 60 * 24 * 7
+            60 * 60 * 24 * 30
           }`
         );
+        return true;
       }
     }),
   getUser: procedure.query(async ({ ctx }) => {

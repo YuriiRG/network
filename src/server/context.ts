@@ -20,35 +20,76 @@ type CreateInnerContextOptions = {
  * @see https://trpc.io/docs/context#inner-and-outer-context
  */
 export async function createContextInner(opts: CreateInnerContextOptions) {
-  let session: (Session & { user: User }) | null = null;
-
   if (!opts.sessionId) {
     return {
       prisma,
-      session
+      session: null
     };
   }
 
-  try {
-    session = await prisma.session.update({
-      where: {
-        id: opts.sessionId
-      },
-      data: {
-        lastActivity: new Date(),
-        userAgent: opts.userAgent,
-        ipAddress: opts.ipAddress
-      },
-      include: {
-        user: true
+  let session = await prisma.session.findFirst({
+    where: {
+      id: opts.sessionId
+    },
+    include: {
+      user: {
+        select: {
+          id: true,
+          name: true,
+          about: true,
+          registeredAt: true
+        }
       }
-    });
-  } finally {
+    }
+  });
+
+  if (session === null) {
     return {
       prisma,
       session
     };
   }
+
+  if (
+    new Date(session.createdAt.getTime() + 1000 * 60 * 60 * 24 * 30) <
+    new Date()
+  ) {
+    await prisma.session.delete({
+      where: {
+        id: opts.sessionId
+      }
+    });
+    session = null;
+    return {
+      prisma,
+      session
+    };
+  }
+
+  session = await prisma.session.update({
+    where: {
+      id: opts.sessionId
+    },
+    data: {
+      lastActivity: new Date(),
+      userAgent: opts.userAgent,
+      ipAddress: opts.ipAddress
+    },
+    include: {
+      user: {
+        select: {
+          id: true,
+          name: true,
+          about: true,
+          registeredAt: true
+        }
+      }
+    }
+  });
+  return {
+    prisma,
+    session
+  };
 }
 /**
  * Outer context. Used in the routers and will e.g. bring `req` & `res` to the context as "not `undefined`".
