@@ -1,9 +1,24 @@
 import Head from 'next/head';
-import { useState } from 'react';
+import Router from 'next/router';
+import { useEffect, useState } from 'react';
 import { TbEye, TbEyeOff } from 'react-icons/tb';
 import Layout from '../components/Layout';
+import { api } from '../utils/api';
 export default function SignIn() {
   const [showPassword, setShowPassword] = useState(false);
+  const utils = api.useContext();
+  const { mutate, data, isLoading } = api.auth.signIn.useMutation({
+    onSuccess: () => {
+      utils.auth.invalidate();
+    }
+  });
+  const [name, setName] = useState('');
+  const [password, setPassword] = useState('');
+  useEffect(() => {
+    if (data?.success) {
+      Router.push('/');
+    }
+  }, [data]);
   return (
     <>
       <Head>
@@ -13,7 +28,9 @@ export default function SignIn() {
         <form
           className='flex w-72 flex-col gap-6'
           onSubmit={(e) => {
+            console.log('submit');
             e.preventDefault();
+            mutate({ name, password });
           }}
         >
           <h1 className='text-4xl font-bold'>Sign In</h1>
@@ -22,6 +39,8 @@ export default function SignIn() {
             name='name'
             placeholder='Username'
             autoComplete='off'
+            value={name}
+            onChange={(e) => setName(e.target.value)}
             className='rounded-lg border-2 border-gray-200 bg-gray-100 p-3'
           />
           <div className='relative'>
@@ -29,6 +48,8 @@ export default function SignIn() {
               type={showPassword ? 'text' : 'password'}
               name='password'
               placeholder='Password'
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               className='w-full rounded-lg border-2 border-gray-200 bg-gray-100 p-3 pr-10 font-mono placeholder:font-sans'
             />
             <div
@@ -55,9 +76,10 @@ export default function SignIn() {
 
           <button
             type='submit'
+            disabled={isLoading}
             className='rounded-lg bg-blue-500 p-3 font-semibold text-white transition-all hover:bg-blue-600 active:bg-blue-700'
           >
-            Sign In
+            {isLoading ? 'Loading...' : 'Sign In'}
           </button>
         </form>
       </Layout>

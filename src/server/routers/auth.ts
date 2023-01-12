@@ -35,10 +35,16 @@ export const authRouter = router({
         }
       });
       if (!user) {
-        return false;
+        return {
+          success: false,
+          error: 'Wrong username'
+        };
       }
       if (!(await bcrypt.compare(input.password, user.passwordHash))) {
-        return false;
+        return {
+          success: false,
+          error: 'Wrong password'
+        };
       }
       if (ctx.res && ctx.req) {
         const session = await ctx.prisma.session.create({
@@ -56,7 +62,9 @@ export const authRouter = router({
             60 * 60 * 24 * 30
           }`
         );
-        return true;
+        return {
+          success: true
+        };
       }
     }),
   getUser: procedure.query(async ({ ctx }) => {
