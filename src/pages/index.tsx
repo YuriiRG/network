@@ -1,5 +1,6 @@
 import { Mutation } from '@tanstack/react-query';
 import { GetServerSidePropsContext } from 'next';
+import Layout from '../components/Layout';
 import { createSSRHelpers } from '../server/helpers/ssr';
 import { api } from '../utils/api';
 
@@ -18,7 +19,7 @@ export default function Home() {
   const { data } = api.auth.getUser.useQuery();
 
   return (
-    <div className='p-4'>
+    <Layout>
       {data && <pre>{JSON.stringify(data, null, 2)}</pre>}
       <button
         className='rounded bg-gray-300 p-2'
@@ -37,7 +38,7 @@ export default function Home() {
       {signUp.isLoading && 'signing up'}
       {signUp.isError && <div>An error occurred: {signUp.error.message}</div>}
       {signUp.isSuccess && <div>Success</div>}
-    </div>
+    </Layout>
   );
 }
 
