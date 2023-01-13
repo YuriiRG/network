@@ -48,7 +48,7 @@ export default function SignIn() {
       </Head>
       <Layout className='flex justify-center'>
         <form
-          className='flex w-72 flex-col gap-6'
+          className='mt-4 flex w-72 flex-col gap-6'
           onSubmit={handleSubmit(onSubmit)}
         >
           <h1 className='text-4xl font-bold'>Sign In</h1>
