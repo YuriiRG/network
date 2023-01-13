@@ -28,6 +28,18 @@ export const authRouter = router({
         password: z.string()
       })
     )
+    .output(
+      z.discriminatedUnion('success', [
+        z.object({
+          success: z.literal(true)
+        }),
+        z.object({
+          success: z.literal(false),
+          errorField: z.union([z.literal('name'), z.literal('password')]),
+          errorMessage: z.string()
+        })
+      ])
+    )
     .mutation(async ({ input, ctx }) => {
       const user = await ctx.prisma.user.findFirst({
         where: {
@@ -37,13 +49,15 @@ export const authRouter = router({
       if (!user) {
         return {
           success: false,
-          error: 'Wrong username'
+          errorField: 'name',
+          errorMessage: 'Invalid username'
         };
       }
       if (!(await bcrypt.compare(input.password, user.passwordHash))) {
         return {
           success: false,
-          error: 'Wrong password'
+          errorField: 'password',
+          errorMessage: 'Invalid password'
         };
       }
       if (ctx.res && ctx.req) {
@@ -62,10 +76,10 @@ export const authRouter = router({
             60 * 60 * 24 * 30
           }`
         );
-        return {
-          success: true
-        };
       }
+      return {
+        success: true
+      };
     }),
   getUser: procedure.query(async ({ ctx }) => {
     return ctx.session?.user ?? null;
