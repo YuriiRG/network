@@ -1,6 +1,6 @@
 import Head from 'next/head';
 import Router from 'next/router';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { TbEye, TbEyeOff } from 'react-icons/tb';
 import Layout from '../components/Layout';
@@ -17,7 +17,6 @@ export default function SignIn() {
       if (data?.success) {
         Router.push('/');
       } else if (data?.success === false) {
-        console.log('setError');
         setError(data.errorField, { message: data.errorMessage });
       }
     }
@@ -30,13 +29,18 @@ export default function SignIn() {
     handleSubmit,
     formState: { errors },
     setError
-  } = useForm<FormInputs>();
+  } = useForm<FormInputs>({
+    mode: 'onChange',
+    reValidateMode: 'onChange'
+  });
 
   const onSubmit: SubmitHandler<FormInputs> = (data) => {
-    console.log('submitting');
     mutate({ ...data });
   };
-  console.log('rendering', errors);
+
+  const isValidationError =
+    errors.name !== undefined || errors.password !== undefined;
+
   return (
     <>
       <Head>
@@ -62,7 +66,7 @@ export default function SignIn() {
             className={
               'rounded-lg border-2 p-3' +
               ' ' +
-              (errors.name
+              (errors.name !== undefined
                 ? 'border-red-600 bg-red-50 outline-2 outline-red-600 focus:outline'
                 : 'border-gray-200 bg-gray-100')
             }
@@ -73,9 +77,9 @@ export default function SignIn() {
               placeholder='Password'
               {...register('password', { required: 'Password is required' })}
               className={
-                'w-full rounded-lg border-2 border-gray-200 bg-gray-100 p-3 pr-10 font-mono placeholder:font-sans' +
+                'w-full rounded-lg border-2 p-3 pr-10 font-mono placeholder:font-sans' +
                 ' ' +
-                (errors.password
+                (errors.password !== undefined
                   ? 'border-red-600 bg-red-50 outline-2 outline-red-600 focus:outline'
                   : 'border-gray-200 bg-gray-100')
               }
@@ -104,13 +108,13 @@ export default function SignIn() {
 
           <button
             type='submit'
-            disabled={isLoading}
-            className='rounded-lg bg-blue-500 p-3 font-semibold text-white transition-all hover:bg-blue-600 active:bg-blue-700'
+            disabled={isLoading || isValidationError}
+            className='rounded-lg bg-blue-500 p-3 font-semibold text-white transition-all hover:enabled:bg-blue-600 active:enabled:bg-blue-700 disabled:bg-gray-300 disabled:text-gray-700'
           >
             {isLoading ? 'Loading...' : 'Sign In'}
           </button>
 
-          {(errors.name || errors.password) && (
+          {isValidationError && (
             <div className='rounded-r-lg border-l-8 border-red-600 bg-red-100 p-4'>
               <ul>
                 {[errors.name?.message, errors.password?.message].map(
