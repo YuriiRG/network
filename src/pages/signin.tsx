@@ -2,7 +2,7 @@ import Head from 'next/head';
 import Router from 'next/router';
 import { useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
-import { TbEye, TbEyeOff } from 'react-icons/tb';
+import { IconEye, IconEyeOff, IconLoader2 } from '@tabler/icons';
 import Layout from '../components/Layout';
 import { api } from '../utils/api';
 
@@ -85,20 +85,19 @@ export default function SignIn() {
               }
             />
             <div
-              className='absolute right-2 top-1/2 h-6 w-6 -translate-y-1/2 text-gray-600 outline-none'
+              className='absolute right-2 top-1/2 -translate-y-1/2 text-gray-600 outline-none'
               onClick={() => setShowPassword((sp) => !sp)}
+              title={showPassword ? 'Hide password' : 'Show password'}
             >
               {showPassword ? (
-                <TbEyeOff
+                <IconEyeOff
                   className='h-full w-full'
-                  title='Hide password'
                   aria-label='Hide password'
                   cursor={'pointer'}
                 />
               ) : (
-                <TbEye
+                <IconEye
                   className='h-full w-full'
-                  title='Show password'
                   aria-label='Show password'
                   cursor={'pointer'}
                 />
@@ -111,7 +110,11 @@ export default function SignIn() {
             disabled={isLoading || isValidationError}
             className='rounded-lg bg-blue-500 p-3 font-semibold text-white transition-all hover:enabled:bg-blue-600 active:enabled:bg-blue-700 disabled:bg-gray-300 disabled:text-gray-700'
           >
-            {isLoading ? 'Loading...' : 'Sign In'}
+            {isLoading ? (
+              <IconLoader2 className='mx-auto animate-spin' />
+            ) : (
+              'Sign In'
+            )}
           </button>
 
           {isValidationError && (
