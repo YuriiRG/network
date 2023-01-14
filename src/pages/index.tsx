@@ -20,7 +20,11 @@ export default function Home() {
 
   return (
     <Layout>
-      {data && <pre>{JSON.stringify(data, null, 2)}</pre>}
+      {data && (
+        <pre className='whitespace-pre-wrap'>
+          {JSON.stringify(data, null, 2)}
+        </pre>
+      )}
       <button
         className='rounded bg-gray-300 p-2'
         onClick={() => signIn.mutate({ name: 'JohnDoe', password: '12345678' })}
