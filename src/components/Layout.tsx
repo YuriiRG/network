@@ -12,6 +12,12 @@ export default function Layout({
   className?: string;
 }) {
   const { data } = api.auth.getUser.useQuery();
+  const utils = api.useContext();
+  const signOut = api.auth.signOut.useMutation({
+    onSuccess: () => {
+      utils.auth.invalidate();
+    }
+  });
   return (
     <div className='flex flex-col'>
       <header className='flex justify-between px-2 pt-1'>
@@ -28,8 +34,14 @@ export default function Layout({
             <button className='h-full w-full'>
               <IconUserCircle className='h-full w-full' />
             </button>
-            <div className='absolute top-10 right-0 hidden rounded-lg border border-gray-500 bg-gray-100 p-4 shadow-md group-hover:block'>
-              {data.name}
+            <div className='absolute top-10 right-0 hidden w-max max-w-sm rounded-lg border bg-gray-100 px-4 py-2 shadow-md group-hover:block'>
+              <div className='p-2 font-semibold'>{data.name}</div>
+              <button
+                className='rounded-lg bg-blue-400 px-4 py-2'
+                onClick={() => signOut.mutate()}
+              >
+                Sign out
+              </button>
             </div>
           </div>
         ) : (

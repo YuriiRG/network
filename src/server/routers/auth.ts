@@ -81,6 +81,22 @@ export const authRouter = router({
         success: true
       };
     }),
+  signOut: procedure.mutation(async ({ ctx }) => {
+    if (ctx.session) {
+      await ctx.prisma.session.delete({
+        where: {
+          id: ctx.session.id
+        }
+      });
+    }
+    if (ctx.res && ctx.req) {
+      ctx.res.setHeader(
+        'Set-Cookie',
+        `sessionId=deleted; HttpOnly; Max-Age=-1`
+      );
+    }
+    return true;
+  }),
   getUser: procedure.query(async ({ ctx }) => {
     return ctx.session?.user ?? null;
   })
