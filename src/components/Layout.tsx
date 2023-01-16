@@ -20,21 +20,16 @@ export default function Layout({
   });
   return (
     <div className='flex flex-col'>
-      <header className='flex justify-between px-2 pt-1'>
-        <nav className='flex items-baseline gap-2'>
-          <Link href='/' className='text-xl font-bold'>
-            Network
-          </Link>
-          <ul className='flex'>
-            <NavLink href='/'>Main page</NavLink>
-          </ul>
-        </nav>
+      <header className='flex items-center justify-between px-2 pt-1'>
+        <Link href='/' className='text-xl font-bold'>
+          Network
+        </Link>
         {data ? (
-          <div className='group relative h-10 w-10 self-center'>
-            <button className='h-full w-full'>
+          <div className='group relative h-10 w-10'>
+            <button className='peer h-full w-full'>
               <IconUserCircle className='h-full w-full' />
             </button>
-            <div className='absolute top-10 right-0 hidden w-max max-w-sm rounded-lg border bg-gray-100 px-4 py-2 shadow-md group-hover:block'>
+            <div className='absolute top-10 right-0 hidden w-max max-w-sm rounded-lg border bg-gray-100 px-4 py-2 shadow-md group-hover:block peer-focus:block'>
               <div className='p-2 font-semibold'>{data.name}</div>
               <button
                 className='rounded-lg bg-blue-400 px-4 py-2'
