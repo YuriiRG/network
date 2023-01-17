@@ -5,12 +5,11 @@ import { SubmitHandler, useForm } from 'react-hook-form';
 import { IconEye, IconEyeOff, IconLoader2 } from '@tabler/icons';
 import Layout from '../components/Layout';
 import { api } from '../utils/api';
+import TextInput from '../features/forms/TextInput';
+import PasswordInput from '../features/forms/PasswordInput';
 
 export default function SignIn() {
-  const [showPassword, setShowPassword] = useState(false);
-
   const utils = api.useContext();
-
   const { mutate, isLoading } = api.auth.signIn.useMutation({
     onSuccess: (data) => {
       utils.auth.invalidate();
@@ -52,58 +51,19 @@ export default function SignIn() {
           onSubmit={handleSubmit(onSubmit)}
         >
           <h1 className='text-4xl font-bold'>Sign In</h1>
-          <input
-            type='text'
+          <TextInput
             placeholder='Username'
             autoComplete='off'
             {...register('name', {
-              required: { value: true, message: 'Username is required' },
-              maxLength: {
-                value: 20,
-                message: 'Username cannot be longer than 20 characters'
-              }
+              required: { value: true, message: 'Username is required' }
             })}
-            className={
-              'rounded-lg border-2 p-3' +
-              ' ' +
-              (errors.name !== undefined
-                ? 'border-red-600 bg-red-50 outline-2 outline-red-600 focus:outline'
-                : 'border-gray-200 bg-gray-100')
-            }
+            isError={errors.name !== undefined}
           />
-          <div className='relative'>
-            <input
-              type={showPassword ? 'text' : 'password'}
-              placeholder='Password'
-              {...register('password', { required: 'Password is required' })}
-              className={
-                'w-full rounded-lg border-2 p-3 pr-10 font-mono placeholder:font-sans' +
-                ' ' +
-                (errors.password !== undefined
-                  ? 'border-red-600 bg-red-50 outline-2 outline-red-600 focus:outline'
-                  : 'border-gray-200 bg-gray-100')
-              }
-            />
-            <div
-              className='absolute right-2 top-1/2 -translate-y-1/2 text-gray-600 outline-none'
-              onClick={() => setShowPassword((sp) => !sp)}
-              title={showPassword ? 'Hide password' : 'Show password'}
-            >
-              {showPassword ? (
-                <IconEyeOff
-                  className='h-full w-full'
-                  aria-label='Hide password'
-                  cursor={'pointer'}
-                />
-              ) : (
-                <IconEye
-                  className='h-full w-full'
-                  aria-label='Show password'
-                  cursor={'pointer'}
-                />
-              )}
-            </div>
-          </div>
+          <PasswordInput
+            placeholder='Password'
+            isError={errors.password !== undefined}
+            {...register('password', { required: 'Password is required' })}
+          />
 
           <button
             type='submit'

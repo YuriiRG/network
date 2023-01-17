@@ -20,7 +20,7 @@ export default function Layout({
   });
   return (
     <div className='flex flex-col'>
-      <header className='flex items-center justify-between px-2 pt-1'>
+      <header className='flex items-baseline justify-between px-2 pt-1'>
         <Link href='/' className='text-xl font-bold'>
           Network
         </Link>

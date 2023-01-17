@@ -21,7 +21,7 @@ export default function Home() {
   return (
     <Layout>
       {data && (
-        <pre className='whitespace-pre-wrap'>
+        <pre className='whitespace-pre-wrap break-words'>
           {JSON.stringify(data, null, 2)}
         </pre>
       )}
