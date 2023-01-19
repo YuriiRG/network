@@ -20,8 +20,8 @@ export default function SignIn() {
   const utils = api.useContext();
   const { mutate, isLoading } = api.auth.signIn.useMutation({
     onSuccess: (data) => {
-      utils.auth.invalidate();
       if (data?.success) {
+        utils.auth.invalidate();
         Router.push('/');
       } else if (data?.success === false) {
         setError(data.errorField, { message: data.errorMessage });
