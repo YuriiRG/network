@@ -9,6 +9,7 @@ import PasswordInput from '../features/forms/PasswordInput';
 import { z } from 'zod';
 import SubmitButton from '../features/forms/SubmitButton';
 import { zodResolver } from '@hookform/resolvers/zod';
+import ErrorsBlock from '../features/forms/ErrorsBlock';
 
 export const signInSchema = z.object({
   name: z.string().min(1, 'Username is required'),
@@ -76,21 +77,9 @@ export default function SignIn() {
               'Sign In'
             )}
           </SubmitButton>
-
-          {isValidationError && (
-            <div className='rounded-r-lg border-l-8 border-red-600 bg-red-100 p-4'>
-              <ul>
-                {[errors.name?.message, errors.password?.message].map(
-                  (errorMessage) =>
-                    errorMessage && (
-                      <li key={errorMessage} className='font-semibold'>
-                        {errorMessage}
-                      </li>
-                    )
-                )}
-              </ul>
-            </div>
-          )}
+          <ErrorsBlock
+            errors={[errors.name?.message, errors.password?.message]}
+          />
         </form>
       </Layout>
     </>

@@ -5,9 +5,11 @@ import PasswordInput from '../features/forms/PasswordInput';
 import SubmitButton from '../features/forms/SubmitButton';
 import TextInput from '../features/forms/TextInput';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { SubmitHandler, useForm } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { api } from '../utils/api';
 import Router from 'next/router';
+import ErrorsBlock from '../features/forms/ErrorsBlock';
+import { IconLoader2 } from '@tabler/icons';
 
 export const signUpSchema = z.object({
   name: z
@@ -26,27 +28,44 @@ export default function SignUp() {
     register,
     handleSubmit,
     formState: { errors },
-    setError
+    setError,
+    getValues
   } = useForm<z.infer<typeof signUpSchema>>({
     resolver: zodResolver(signUpSchema),
     mode: 'onChange',
     reValidateMode: 'onChange'
   });
 
-  const utils = api.useContext();
-  const { mutate, isLoading } = api.auth.signUp.useMutation({
-    onSuccess: (data) => {
-      utils.auth.invalidate();
-      if (data?.success) {
-        Router.push('/');
-      } else if (data?.success === false) {
-        setError(data.errorField, { message: data.errorMessage });
+  const { mutate: signInMutate, isLoading: signInLoading } =
+    api.auth.signIn.useMutation({
+      onSuccess: (data) => {
+        if (data.success) {
+          utils.auth.invalidate();
+          Router.push('/');
+        } else if (data.success === false) {
+          setError(data.errorField, { message: data.errorMessage });
+        }
       }
-    }
-  });
+    });
+
+  const utils = api.useContext();
+  const { mutate: signUpMutate, isLoading: signUpLoading } =
+    api.auth.signUp.useMutation({
+      onSuccess: (data) => {
+        if (data.success) {
+          const formData = getValues();
+          signInMutate({ name: formData.name, password: formData.password });
+        } else if (data.success === false) {
+          setError(data.errorField, { message: data.errorMessage });
+        }
+      }
+    });
+
+  const isLoading = signInLoading || signUpLoading;
 
   const isValidationError =
     errors.name !== undefined || errors.password !== undefined;
+
   return (
     <>
       <Head>
@@ -56,7 +75,7 @@ export default function SignUp() {
         <form
           className='mt-4 flex w-72 flex-col gap-6'
           onSubmit={handleSubmit((data) => {
-            mutate({ ...data });
+            signUpMutate({ ...data });
           })}
         >
           <h1 className='text-4xl font-bold'>Sign Up</h1>
@@ -70,7 +89,16 @@ export default function SignUp() {
             placeholder='Password'
             {...register('password')}
           />
-          <SubmitButton>Sign up</SubmitButton>
+          <SubmitButton disabled={isLoading || isValidationError}>
+            {isLoading ? (
+              <IconLoader2 className='mx-auto animate-spin' />
+            ) : (
+              'Sign Up'
+            )}
+          </SubmitButton>
+          <ErrorsBlock
+            errors={[errors.name?.message, errors.password?.message]}
+          />
         </form>
       </Layout>
     </>

@@ -22,12 +22,20 @@ export const authRouter = router({
       ])
     )
     .mutation(async ({ input, ctx }) => {
-      await ctx.prisma.user.create({
-        data: {
-          name: input.name,
-          passwordHash: await bcrypt.hash(input.password, 10)
-        }
-      });
+      try {
+        await ctx.prisma.user.create({
+          data: {
+            name: input.name,
+            passwordHash: await bcrypt.hash(input.password, 10)
+          }
+        });
+      } catch {
+        return {
+          success: false,
+          errorField: 'name',
+          errorMessage: 'User already exists'
+        };
+      }
       return {
         success: true
       };
