@@ -1,12 +1,19 @@
 import Head from 'next/head';
 import Router from 'next/router';
-import { useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
-import { IconEye, IconEyeOff, IconLoader2 } from '@tabler/icons';
+import { IconLoader2 } from '@tabler/icons';
 import Layout from '../components/Layout';
 import { api } from '../utils/api';
 import TextInput from '../features/forms/TextInput';
 import PasswordInput from '../features/forms/PasswordInput';
+import { z } from 'zod';
+import SubmitButton from '../features/forms/SubmitButton';
+import { zodResolver } from '@hookform/resolvers/zod';
+
+export const signInSchema = z.object({
+  name: z.string().min(1, 'Username is required'),
+  password: z.string().min(1, 'Password is required')
+});
 
 export default function SignIn() {
   const utils = api.useContext();
@@ -21,19 +28,18 @@ export default function SignIn() {
     }
   });
 
-  type FormInputs = Parameters<typeof mutate>[0];
-
   const {
     register,
     handleSubmit,
     formState: { errors },
     setError
-  } = useForm<FormInputs>({
+  } = useForm<z.infer<typeof signInSchema>>({
+    resolver: zodResolver(signInSchema),
     mode: 'onChange',
     reValidateMode: 'onChange'
   });
 
-  const onSubmit: SubmitHandler<FormInputs> = (data) => {
+  const onSubmit: SubmitHandler<z.infer<typeof signInSchema>> = (data) => {
     mutate({ ...data });
   };
 
@@ -54,28 +60,22 @@ export default function SignIn() {
           <TextInput
             placeholder='Username'
             autoComplete='off'
-            {...register('name', {
-              required: { value: true, message: 'Username is required' }
-            })}
+            {...register('name')}
             isError={errors.name !== undefined}
           />
           <PasswordInput
             placeholder='Password'
             isError={errors.password !== undefined}
-            {...register('password', { required: 'Password is required' })}
+            {...register('password')}
           />
 
-          <button
-            type='submit'
-            disabled={isLoading || isValidationError}
-            className='rounded-lg bg-blue-500 p-3 font-semibold text-white transition-all hover:enabled:bg-blue-600 active:enabled:bg-blue-700 disabled:bg-gray-300 disabled:text-gray-700'
-          >
+          <SubmitButton disabled={isLoading || isValidationError}>
             {isLoading ? (
               <IconLoader2 className='mx-auto animate-spin' />
             ) : (
               'Sign In'
             )}
-          </button>
+          </SubmitButton>
 
           {isValidationError && (
             <div className='rounded-r-lg border-l-8 border-red-600 bg-red-100 p-4'>

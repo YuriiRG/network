@@ -3,31 +3,37 @@ import { router, procedure } from '../trpc';
 import bcrypt from 'bcrypt';
 import { getClientIp } from 'request-ip';
 import { TRPCError } from '@trpc/server';
+import { signInSchema } from '../../pages/signin';
+import { signUpSchema } from '../../pages/signup';
 
 export const authRouter = router({
   signUp: procedure
-    .input(
-      z.object({
-        name: z.string(),
-        password: z.string(),
-        about: z.string().optional()
-      })
+    .input(signUpSchema)
+    .output(
+      z.discriminatedUnion('success', [
+        z.object({
+          success: z.literal(true)
+        }),
+        z.object({
+          success: z.literal(false),
+          errorField: z.union([z.literal('name'), z.literal('password')]),
+          errorMessage: z.string()
+        })
+      ])
     )
     .mutation(async ({ input, ctx }) => {
-      return await ctx.prisma.user.create({
+      await ctx.prisma.user.create({
         data: {
           name: input.name,
           passwordHash: await bcrypt.hash(input.password, 10)
         }
       });
+      return {
+        success: true
+      };
     }),
   signIn: procedure
-    .input(
-      z.object({
-        name: z.string(),
-        password: z.string()
-      })
-    )
+    .input(signInSchema)
     .output(
       z.discriminatedUnion('success', [
         z.object({
