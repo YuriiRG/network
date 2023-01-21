@@ -1,4 +1,3 @@
-import { Session, User } from '@prisma/client';
 import { inferAsyncReturnType } from '@trpc/server';
 import { CreateNextContextOptions } from '@trpc/server/adapters/next';
 import { getClientIp } from 'request-ip';
