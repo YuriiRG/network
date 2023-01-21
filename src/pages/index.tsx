@@ -1,48 +1,57 @@
-import { Dummy } from '@prisma/client';
-import { dehydrate, QueryClient, useQuery } from '@tanstack/react-query';
-import { GetServerSideProps } from 'next';
-import { prisma } from '../server/prisma';
+import { Mutation } from '@tanstack/react-query';
+import { GetServerSidePropsContext } from 'next';
+import Layout from '../components/Layout';
+import { createSSRHelpers } from '../server/helpers/ssr';
+import { api } from '../utils/api';
 
 export default function Home() {
-  const { data: dummies } = useQuery({
-    queryKey: ['dummies'],
-    queryFn: async () => (await (await fetch('/api/dummies')).json()) as Dummy[]
+  const utils = api.useContext();
+  const signUp = api.auth.signUp.useMutation({
+    onSuccess: () => {
+      utils.user.all.invalidate();
+    }
   });
+  const signIn = api.auth.signIn.useMutation({
+    onSuccess: () => {
+      utils.auth.getUser.invalidate();
+    }
+  });
+  const { data } = api.auth.getUser.useQuery();
+
   return (
-    <article className='prose m-4 mt-10'>
-      <h1>Hello, World!</h1>
-      <p>
-        Lorem ipsum dolor sit amet consectetur, adipisicing elit. Quos rem
-        consectetur maxime voluptas nostrum, libero perferendis sapiente ipsam
-        laboriosam enim labore nobis distinctio porro, voluptates repellat
-        similique dolores, dolore deleniti.
-      </p>
-      <ol>
-        {dummies?.map((dummy) => (
-          <li key={dummy.id}>
-            id: {dummy.id}; data: {dummy.data}
-          </li>
-        ))}
-      </ol>
-    </article>
+    <Layout>
+      {data && (
+        <pre className='whitespace-pre-wrap break-words'>
+          {JSON.stringify(data, null, 2)}
+        </pre>
+      )}
+      <button
+        className='rounded bg-gray-300 p-2'
+        onClick={() => signIn.mutate({ name: 'JohnDoe', password: '12345678' })}
+      >
+        Sign In
+      </button>
+      <button
+        className='rounded bg-gray-300 p-2'
+        onClick={() =>
+          signUp.mutate({ name: 'JohnDoe3', password: '12345678' })
+        }
+      >
+        Sign Up
+      </button>
+      {signUp.isLoading && 'signing up'}
+      {signUp.isError && <div>An error occurred: {signUp.error.message}</div>}
+      {signUp.isSuccess && <div>Success</div>}
+    </Layout>
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
-  const queryClient = new QueryClient();
-
-  await prisma.dummy.create({
-    data: {
-      data: context.req.headers['user-agent']
-    }
-  });
-
-  const dummies = await prisma.dummy.findMany();
-
-  await queryClient.prefetchQuery(['dummies'], () => dummies);
+export async function getServerSideProps(context: GetServerSidePropsContext) {
+  const ssr = await createSSRHelpers(context);
+  await ssr.auth.getUser.prefetch();
   return {
     props: {
-      dehydratedState: dehydrate(queryClient)
+      trpcState: ssr.dehydrate()
     }
   };
-};
+}
