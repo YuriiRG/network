@@ -1,5 +1,5 @@
 import { Mutation } from '@tanstack/react-query';
-import { GetServerSidePropsContext } from 'next';
+import type { GetServerSidePropsContext } from 'next';
 import Layout from '../components/Layout';
 import { createSSRHelpers } from '../server/helpers/ssr';
 import { api } from '../utils/api';

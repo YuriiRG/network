@@ -1,5 +1,5 @@
-import { inferAsyncReturnType } from '@trpc/server';
-import { CreateNextContextOptions } from '@trpc/server/adapters/next';
+import type { inferAsyncReturnType } from '@trpc/server';
+import type { CreateNextContextOptions } from '@trpc/server/adapters/next';
 import { getClientIp } from 'request-ip';
 import { prisma } from './db';
 

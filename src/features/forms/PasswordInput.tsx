@@ -1,5 +1,5 @@
 import { IconEye, IconEyeOff } from '@tabler/icons';
-import { forwardRef, InputHTMLAttributes, useState } from 'react';
+import { forwardRef, type InputHTMLAttributes, useState } from 'react';
 import { twMerge } from 'tailwind-merge';
 
 type TextInputProps = {

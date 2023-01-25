@@ -1,4 +1,4 @@
-import { GetServerSidePropsContext } from 'next';
+import type { GetServerSidePropsContext } from 'next';
 import { useRouter } from 'next/router';
 import { z } from 'zod';
 import Layout from '../../components/Layout';

@@ -1,6 +1,6 @@
 import { IconUserCircle } from '@tabler/icons';
 import Link from 'next/link';
-import { ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import NavLink from '../features/layout/NavLink';
 import { api } from '../utils/api';
 
