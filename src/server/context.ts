@@ -1,34 +1,44 @@
-import type { inferAsyncReturnType } from '@trpc/server';
+import type { Session } from '@prisma/client';
 import type { CreateNextContextOptions } from '@trpc/server/adapters/next';
+import type { GetServerSidePropsContext } from 'next';
 import { getClientIp } from 'request-ip';
 import { prisma } from './db';
 
-type CreateInnerContextOptions = {
-  sessionId?: string;
-  ipAddress: string | null;
-  userAgent: string | null;
-};
+type CreateInnerContextOptions =
+  | GetServerSidePropsContext
+  | CreateNextContextOptions;
 
-/**
- * Inner context. Will always be available in your procedures, in contrast to the outer context.
- *
- * Also useful for:
- * - testing, so you don't have to mock Next.js' `req`/`res`
- * - tRPC's `createSSGHelpers` where we don't have Next API `req`/`res` (not getServerSideProps ones)
- *
- * @see https://trpc.io/docs/context#inner-and-outer-context
- */
-export async function createContextInner(opts: CreateInnerContextOptions) {
-  if (!opts.sessionId) {
-    return {
-      prisma,
-      session: null
-    };
+export async function createContext(opts: CreateInnerContextOptions): Promise<{
+  prisma: typeof prisma;
+  session:
+    | (Session & {
+        user: {
+          id: string;
+          name: string;
+          about: string | null;
+          registeredAt: Date;
+        };
+      })
+    | null;
+  req: CreateInnerContextOptions['req'];
+  res: CreateInnerContextOptions['res'];
+}> {
+  const sessionId = opts.req.cookies.sessionId;
+
+  const result: Context = {
+    prisma,
+    session: null,
+    req: opts.req,
+    res: opts.res
+  };
+
+  if (!sessionId) {
+    return result;
   }
 
   let session = await prisma.session.findFirst({
     where: {
-      id: opts.sessionId
+      id: sessionId
     },
     include: {
       user: {
@@ -43,10 +53,7 @@ export async function createContextInner(opts: CreateInnerContextOptions) {
   });
 
   if (session === null) {
-    return {
-      prisma,
-      session
-    };
+    return result;
   }
 
   if (
@@ -55,24 +62,20 @@ export async function createContextInner(opts: CreateInnerContextOptions) {
   ) {
     await prisma.session.delete({
       where: {
-        id: opts.sessionId
+        id: sessionId
       }
     });
-    session = null;
-    return {
-      prisma,
-      session
-    };
+    return result;
   }
 
   session = await prisma.session.update({
     where: {
-      id: opts.sessionId
+      id: sessionId
     },
     data: {
       lastActivity: new Date(),
-      userAgent: opts.userAgent,
-      ipAddress: opts.ipAddress
+      userAgent: opts.req.headers['user-agent'] ?? null,
+      ipAddress: getClientIp(opts.req)
     },
     include: {
       user: {
@@ -85,34 +88,8 @@ export async function createContextInner(opts: CreateInnerContextOptions) {
       }
     }
   });
-  return {
-    prisma,
-    session
-  };
-}
-/**
- * Outer context. Used in the routers and will e.g. bring `req` & `res` to the context as "not `undefined`".
- *
- * @see https://trpc.io/docs/context#inner-and-outer-context
- */
-export async function createContext(opts: CreateNextContextOptions) {
-  const contextInner = await createContextInner({
-    sessionId: opts.req.cookies.sessionId,
-    ipAddress: getClientIp(opts.req),
-    userAgent: opts.req.headers['user-agent'] ?? null
-  });
-  return {
-    ...contextInner,
-    req: opts.req,
-    res: opts.res
-  };
+  result.session = session;
+  return result;
 }
 
-export type InnerContext = inferAsyncReturnType<typeof createContextInner>;
-
-export type OuterContext = Omit<
-  inferAsyncReturnType<typeof createContext>,
-  keyof InnerContext
->;
-
-export type Context = InnerContext & Partial<OuterContext>;
+export type Context = Awaited<ReturnType<typeof createContext>>;

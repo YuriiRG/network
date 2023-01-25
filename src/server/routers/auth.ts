@@ -74,23 +74,19 @@ export const authRouter = router({
           errorMessage: 'Invalid password'
         };
       }
-      if (ctx.res && ctx.req) {
-        const session = await ctx.prisma.session.create({
-          data: {
-            ipAddress: getClientIp(ctx.req),
-            userAgent: ctx.req.headers['user-agent'],
-            userId: user.id
-          }
-        });
-        ctx.res.setHeader(
-          'Set-Cookie',
-          `sessionId=${
-            session.id
-          }; Secure; HttpOnly; SameSite=Lax; Path=/; Max-Age=${
-            60 * 60 * 24 * 30
-          }`
-        );
-      }
+      const session = await ctx.prisma.session.create({
+        data: {
+          ipAddress: getClientIp(ctx.req),
+          userAgent: ctx.req.headers['user-agent'],
+          userId: user.id
+        }
+      });
+      ctx.res.setHeader(
+        'Set-Cookie',
+        `sessionId=${
+          session.id
+        }; Secure; HttpOnly; SameSite=Lax; Path=/; Max-Age=${60 * 60 * 24 * 30}`
+      );
       return {
         success: true
       };
@@ -103,12 +99,7 @@ export const authRouter = router({
         }
       });
     }
-    if (ctx.res && ctx.req) {
-      ctx.res.setHeader(
-        'Set-Cookie',
-        `sessionId=deleted; HttpOnly; Max-Age=-1`
-      );
-    }
+    ctx.res.setHeader('Set-Cookie', `sessionId=deleted; HttpOnly; Max-Age=-1`);
     return true;
   }),
   getUser: procedure.query(async ({ ctx }) => {
