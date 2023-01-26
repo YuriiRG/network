@@ -8,6 +8,14 @@
   "parserOptions": {
     "project": ["./tsconfig.json"]
   },
+  "overrides": [
+    {
+      "files": ["**/*.{js,cjs,mjs}"],
+      "parserOptions": {
+        "project": null
+      }
+    }
+  ],
   "plugins": ["@typescript-eslint"],
   "rules": {
     "@typescript-eslint/no-unused-vars": "off",
