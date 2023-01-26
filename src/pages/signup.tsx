@@ -38,10 +38,10 @@ export default function SignUp() {
 
   const { mutate: signInMutate, isLoading: signInLoading } =
     api.auth.signIn.useMutation({
-      onSuccess: (data) => {
+      onSuccess: async (data) => {
         if (data.success) {
-          utils.auth.invalidate();
-          Router.push('/');
+          await utils.auth.invalidate();
+          await Router.push('/');
         } else if (data.success === false) {
           setError(data.errorField, { message: data.errorMessage });
         }
@@ -74,9 +74,11 @@ export default function SignUp() {
       <Layout className='flex justify-center'>
         <form
           className='mt-4 flex w-72 flex-col gap-6'
-          onSubmit={handleSubmit((data) => {
-            signUpMutate({ ...data });
-          })}
+          onSubmit={
+            void handleSubmit((data) => {
+              signUpMutate({ ...data });
+            })
+          }
         >
           <h1 className='text-4xl font-bold'>Sign Up</h1>
           <TextInput

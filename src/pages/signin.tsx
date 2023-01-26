@@ -1,6 +1,6 @@
 import Head from 'next/head';
 import Router from 'next/router';
-import type { SubmitHandler} from 'react-hook-form';
+import type { SubmitHandler } from 'react-hook-form';
 import { useForm } from 'react-hook-form';
 import { IconLoader2 } from '@tabler/icons';
 import Layout from '../components/Layout';
@@ -20,10 +20,10 @@ export const signInSchema = z.object({
 export default function SignIn() {
   const utils = api.useContext();
   const { mutate, isLoading } = api.auth.signIn.useMutation({
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       if (data?.success) {
-        utils.auth.invalidate();
-        Router.push('/');
+        await utils.auth.invalidate();
+        await Router.push('/');
       } else if (data?.success === false) {
         setError(data.errorField, { message: data.errorMessage });
       }
@@ -56,7 +56,7 @@ export default function SignIn() {
       <Layout className='flex justify-center'>
         <form
           className='mt-4 flex w-72 flex-col gap-6'
-          onSubmit={handleSubmit(onSubmit)}
+          onSubmit={void handleSubmit(onSubmit)}
         >
           <h1 className='text-4xl font-bold'>Sign In</h1>
           <TextInput

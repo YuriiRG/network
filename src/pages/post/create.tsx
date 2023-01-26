@@ -5,8 +5,10 @@ import { api } from '../../utils/api';
 
 export default function CreatePost() {
   const { mutate, isLoading } = api.post.create.useMutation({
-    onSuccess: (data) => {
-      Router.push(`/post/${data}`);
+    onSuccess: async (data) => {
+      if (data) {
+        await Router.push(`/post/${data}`);
+      }
     }
   });
   const [content, setContent] = useState('');

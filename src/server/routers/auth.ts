@@ -102,7 +102,7 @@ export const authRouter = router({
     ctx.res.setHeader('Set-Cookie', `sessionId=deleted; HttpOnly; Max-Age=-1`);
     return true;
   }),
-  getUser: procedure.query(async ({ ctx }) => {
+  getUser: procedure.query(({ ctx }) => {
     return ctx.session?.user ?? null;
   })
 });

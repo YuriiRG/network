@@ -14,8 +14,8 @@ export default function Layout({
   const { data } = api.auth.getUser.useQuery();
   const utils = api.useContext();
   const signOut = api.auth.signOut.useMutation({
-    onSuccess: () => {
-      utils.auth.invalidate();
+    onSuccess: async () => {
+      await utils.auth.invalidate();
     }
   });
   return (

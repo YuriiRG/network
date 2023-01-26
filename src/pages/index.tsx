@@ -7,13 +7,13 @@ import { api } from '../utils/api';
 export default function Home() {
   const utils = api.useContext();
   const signUp = api.auth.signUp.useMutation({
-    onSuccess: () => {
-      utils.user.all.invalidate();
+    onSuccess: async () => {
+      await utils.user.all.invalidate();
     }
   });
   const signIn = api.auth.signIn.useMutation({
-    onSuccess: () => {
-      utils.auth.getUser.invalidate();
+    onSuccess: async () => {
+      await utils.auth.getUser.invalidate();
     }
   });
   const { data } = api.auth.getUser.useQuery();
