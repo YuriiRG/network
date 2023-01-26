@@ -2,6 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-.flex > * {
+.flex:not(.flex-col) > * {
   min-width: 0;
 }
