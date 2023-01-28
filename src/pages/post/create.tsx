@@ -1,7 +1,8 @@
+import { EditorContent, useEditor } from '@tiptap/react';
+import StarterKit from '@tiptap/starter-kit';
 import Router from 'next/router';
 import { useState } from 'react';
 import Layout from '../../components/Layout';
-import PostEditor from '../../features/editor/PostEditor';
 import { api } from '../../utils/api';
 
 export default function CreatePost() {
@@ -12,15 +13,35 @@ export default function CreatePost() {
       }
     }
   });
-  const [content, setContent] = useState('');
-
+  const editor = useEditor({
+    extensions: [
+      StarterKit.configure({
+        heading: {
+          levels: [2, 3, 4]
+        }
+      })
+    ],
+    editorProps: {
+      attributes: {
+        class: 'prose'
+      }
+    },
+    content: '<p>Hello World!</p>'
+  });
+  const [title, setTitle] = useState('');
   return (
     <Layout className='flex justify-center'>
       <div className='flex w-prose flex-col'>
-        <PostEditor />
+        <input
+          type='text'
+          placeholder='Title'
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+        />
+        <EditorContent editor={editor} />
         <button
           onClick={() => {
-            mutate({ content, title: content.split('\n').at(0) ?? 'Untitled' });
+            mutate({ content: editor?.getHTML() ?? '', title });
           }}
         >
           {isLoading ? 'Loading...' : 'Publish'}

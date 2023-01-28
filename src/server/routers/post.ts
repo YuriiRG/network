@@ -1,3 +1,4 @@
+import { TRPCError } from '@trpc/server';
 import { z } from 'zod';
 import { router, procedure } from '../trpc';
 
@@ -38,7 +39,7 @@ export const postRouter = router({
         });
         return id;
       } catch {
-        return null;
+        throw new TRPCError({ code: 'BAD_REQUEST' });
       }
     })
 });
