@@ -24,7 +24,7 @@ export const postRouter = router({
     )
     .mutation(async ({ ctx, input }) => {
       if (ctx.session === null) {
-        return null;
+        throw new TRPCError({ code: 'UNAUTHORIZED' });
       }
       try {
         const { id } = await ctx.prisma.post.create({
@@ -39,7 +39,7 @@ export const postRouter = router({
         });
         return id;
       } catch {
-        throw new TRPCError({ code: 'BAD_REQUEST' });
+        throw new TRPCError({ code: 'CONFLICT' });
       }
     })
 });

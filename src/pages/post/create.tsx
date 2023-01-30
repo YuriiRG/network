@@ -6,11 +6,13 @@ import Layout from '../../components/Layout';
 import { api } from '../../utils/api';
 
 export default function CreatePost() {
+  const [error, setError] = useState<string | null>(null);
   const { mutate, isLoading } = api.post.create.useMutation({
     onSuccess: async (data) => {
-      if (data) {
-        await Router.push(`/post/${data}`);
-      }
+      await Router.push(`/post/${data}`);
+    },
+    onError: (data) => {
+      setError('Invalid post');
     }
   });
   const editor = useEditor({
@@ -46,6 +48,7 @@ export default function CreatePost() {
         >
           {isLoading ? 'Loading...' : 'Publish'}
         </button>
+        {error && <div>Error happened</div>}
       </div>
     </Layout>
   );
