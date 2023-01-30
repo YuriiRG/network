@@ -41,10 +41,6 @@ export default function SignIn() {
     reValidateMode: 'onChange'
   });
 
-  const onSubmit: SubmitHandler<z.infer<typeof signInSchema>> = (data) => {
-    mutate({ ...data });
-  };
-
   const isValidationError =
     errors.name !== undefined || errors.password !== undefined;
 
@@ -56,7 +52,7 @@ export default function SignIn() {
       <Layout className='flex justify-center'>
         <form
           className='mt-4 flex w-72 flex-col gap-6'
-          onSubmit={void handleSubmit(onSubmit)}
+          onSubmit={(e) => void handleSubmit((data) => mutate({ ...data }))(e)}
         >
           <h1 className='text-4xl font-bold'>Sign In</h1>
           <TextInput

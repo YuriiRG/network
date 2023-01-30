@@ -74,10 +74,8 @@ export default function SignUp() {
       <Layout className='flex justify-center'>
         <form
           className='mt-4 flex w-72 flex-col gap-6'
-          onSubmit={
-            void handleSubmit((data) => {
-              signUpMutate({ ...data });
-            })
+          onSubmit={(e) =>
+            void handleSubmit((data) => signUpMutate({ ...data }))(e)
           }
         >
           <h1 className='text-4xl font-bold'>Sign Up</h1>
