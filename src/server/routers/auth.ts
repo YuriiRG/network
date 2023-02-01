@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { router, procedure } from '../trpc';
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 import { getClientIp } from 'request-ip';
 import { TRPCError } from '@trpc/server';
 import { signInSchema } from '../../pages/signin';
