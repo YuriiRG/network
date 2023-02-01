@@ -38,7 +38,12 @@ export default function CreatePost() {
           type='text'
           placeholder='Title'
           value={title}
-          onChange={(e) => setTitle(e.target.value)}
+          onChange={(e) => {
+            if (error) {
+              setError(null);
+            }
+            setTitle(e.target.value);
+          }}
         />
         <EditorContent editor={editor} />
         <button
@@ -48,7 +53,7 @@ export default function CreatePost() {
         >
           {isLoading ? 'Loading...' : 'Publish'}
         </button>
-        {error && <div>Error happened</div>}
+        {error && <div>{error}</div>}
       </div>
     </Layout>
   );

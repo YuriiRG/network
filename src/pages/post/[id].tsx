@@ -1,3 +1,4 @@
+import DOMPurify from 'isomorphic-dompurify';
 import type { GetServerSidePropsContext } from 'next';
 import { useRouter } from 'next/router';
 import { z } from 'zod';
@@ -24,7 +25,19 @@ export default function Post() {
   if (data === null) {
     return <Layout>Post doesn&apos;t exist</Layout>;
   }
-  return <Layout>{data.content}</Layout>;
+  return (
+    <Layout className='flex justify-center'>
+      <div className='flex w-prose flex-col'>
+        <div className='prose mb-8'>
+          <h1>{data.title}</h1>
+        </div>
+        <article
+          className='prose'
+          dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(data.content) }}
+        />
+      </div>
+    </Layout>
+  );
 }
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
