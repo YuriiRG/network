@@ -1,3 +1,4 @@
+import { Placeholder } from '@tiptap/extension-placeholder';
 import { EditorContent, useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Router from 'next/router';
@@ -21,11 +22,14 @@ export default function CreatePost() {
         heading: {
           levels: [2, 3, 4]
         }
+      }),
+      Placeholder.configure({
+        placeholder: 'Write something...'
       })
     ],
     editorProps: {
       attributes: {
-        class: 'prose'
+        class: 'prose outline-none outline'
       }
     },
     content: '<p>Hello World!</p>'
@@ -38,6 +42,7 @@ export default function CreatePost() {
           type='text'
           placeholder='Title'
           value={title}
+          className='mb-8 text-5xl font-extrabold outline-none outline'
           onChange={(e) => {
             if (error) {
               setError(null);
