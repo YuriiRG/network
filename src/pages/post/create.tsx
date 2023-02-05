@@ -4,6 +4,7 @@ import StarterKit from '@tiptap/starter-kit';
 import Router from 'next/router';
 import { useState } from 'react';
 import Layout from '../../components/Layout';
+import SubmitButton from '../../features/forms/SubmitButton';
 import { api } from '../../utils/api';
 
 export default function CreatePost() {
@@ -51,13 +52,9 @@ export default function CreatePost() {
           }}
         />
         <EditorContent editor={editor} />
-        <button
-          onClick={() => {
-            mutate({ content: editor?.getHTML() ?? '', title });
-          }}
-        >
+        <SubmitButton className='mt-8 self-start'>
           {isLoading ? 'Loading...' : 'Publish'}
-        </button>
+        </SubmitButton>
         {error && <div>{error}</div>}
       </div>
     </Layout>

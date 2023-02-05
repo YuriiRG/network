@@ -1,9 +1,7 @@
 import { forwardRef, type InputHTMLAttributes } from 'react';
 import { twMerge } from 'tailwind-merge';
 
-type SubmitButtonProps = {
-  isError?: boolean;
-} & Omit<InputHTMLAttributes<HTMLButtonElement>, 'type'>;
+type SubmitButtonProps = Omit<InputHTMLAttributes<HTMLButtonElement>, 'type'>;
 
 export default forwardRef<HTMLButtonElement, SubmitButtonProps>(
   function SubmitButton(
