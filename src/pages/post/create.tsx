@@ -6,15 +6,17 @@ import { useState } from 'react';
 import Layout from '../../components/Layout';
 import SubmitButton from '../../features/forms/SubmitButton';
 import { api } from '../../utils/api';
-
+import ErrorsBlock from '../../features/forms/ErrorsBlock';
 export default function CreatePost() {
   const [error, setError] = useState<string | null>(null);
   const { mutate, isLoading } = api.post.create.useMutation({
     onSuccess: async (data) => {
       await Router.push(`/post/${data}`);
     },
-    onError: (data) => {
-      setError('Invalid post');
+    onError: ({ data }) => {
+      if (data?.code === 'CONFLICT') {
+        setError('A post with the same name already exists');
+      }
     }
   });
   const editor = useEditor({
@@ -51,11 +53,25 @@ export default function CreatePost() {
             setTitle(e.target.value);
           }}
         />
-        <EditorContent editor={editor} />
-        <SubmitButton className='mt-8 self-start'>
+        <EditorContent
+          editor={editor}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              e.preventDefault();
+              editor?.chain().focus().run();
+            }
+          }}
+        />
+        <SubmitButton
+          className='mt-8 mb-4 self-start'
+          onClick={() => {
+            mutate({ content: editor?.getHTML() ?? '', title });
+          }}
+          disabled={isLoading || !!error}
+        >
           {isLoading ? 'Loading...' : 'Publish'}
         </SubmitButton>
-        {error && <div>{error}</div>}
+        <ErrorsBlock errors={[error ?? undefined]} />
       </div>
     </Layout>
   );
