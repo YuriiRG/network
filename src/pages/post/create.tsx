@@ -69,7 +69,12 @@ export default function CreatePost() {
           onClick={() => {
             mutate({ content: editor?.getHTML() ?? '', title });
           }}
-          disabled={isLoading || !!error}
+          disabled={
+            isLoading ||
+            !!error ||
+            (editor?.getText().length ?? 0) < 5 ||
+            title.length < 2
+          }
         >
           {isLoading ? 'Loading...' : 'Publish'}
         </SubmitButton>
