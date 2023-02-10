@@ -45,7 +45,9 @@ export default function CreatePost() {
           type='text'
           placeholder='Title'
           value={title}
-          className='mb-8 text-5xl font-extrabold outline-none outline'
+          className={`mb-8 text-5xl font-extrabold outline-none outline ${
+            error ? 'text-red-700 placeholder:text-red-300' : ''
+          }`}
           onChange={(e) => {
             if (error) {
               setError(null);
