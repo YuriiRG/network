@@ -1,5 +1,6 @@
 import { Mutation } from '@tanstack/react-query';
 import type { GetServerSidePropsContext } from 'next';
+import Link from 'next/link';
 import Layout from '../components/Layout';
 import { createSSRHelpers } from '../server/helpers/ssr';
 import { api } from '../utils/api';
@@ -20,28 +21,13 @@ export default function Home() {
 
   return (
     <Layout>
-      {data && (
-        <pre className='whitespace-pre-wrap break-words'>
-          {JSON.stringify(data, null, 2)}
-        </pre>
-      )}
-      <button
-        className='rounded bg-gray-300 p-2'
-        onClick={() => signIn.mutate({ name: 'JohnDoe', password: '12345678' })}
+      <Link
+        href='/post/create'
+        className={`rounded-lg border-2 border-blue-700 px-4 py-2 text-blue-700
+          hover:border-blue-800 hover:text-blue-800`}
       >
-        Sign In
-      </button>
-      <button
-        className='rounded bg-gray-300 p-2'
-        onClick={() =>
-          signUp.mutate({ name: 'JohnDoe3', password: '12345678' })
-        }
-      >
-        Sign Up
-      </button>
-      {signUp.isLoading && 'signing up'}
-      {signUp.isError && <div>An error occurred: {signUp.error.message}</div>}
-      {signUp.isSuccess && <div>Success</div>}
+        Create a new post
+      </Link>
     </Layout>
   );
 }
