@@ -1,4 +1,4 @@
-import { IconEye, IconEyeOff } from '@tabler/icons';
+import { IconEye, IconEyeOff } from '@tabler/icons-react';
 import { forwardRef, type InputHTMLAttributes, useState } from 'react';
 import { twMerge } from 'tailwind-merge';
 
