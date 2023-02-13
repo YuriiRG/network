@@ -41,17 +41,19 @@ export default function CreatePost() {
   return (
     <Layout className='flex justify-center'>
       <div className='flex w-prose flex-col'>
-        <input
-          type='text'
+        <textarea
           placeholder='Title'
           value={title}
-          className={`mb-8 text-5xl font-extrabold outline-none outline ${
+          rows={1}
+          className={`mb-8 h-auto resize-none overflow-y-hidden text-5xl font-extrabold outline-none outline ${
             error ? 'text-red-700 placeholder:text-red-300' : ''
           }`}
           onChange={(e) => {
             if (error) {
               setError(null);
             }
+            e.target.style.height = 'auto';
+            e.target.style.height = `${e.target.scrollHeight}px`;
             setTitle(e.target.value);
           }}
         />
