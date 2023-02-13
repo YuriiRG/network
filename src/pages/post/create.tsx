@@ -7,6 +7,7 @@ import Layout from '../../components/Layout';
 import SubmitButton from '../../features/forms/SubmitButton';
 import { api } from '../../utils/api';
 import ErrorsBlock from '../../features/forms/ErrorsBlock';
+import BlankEditor from '../../features/forms/BlankEditor';
 export default function CreatePost() {
   const [error, setError] = useState<string | null>(null);
   const { mutate, isLoading } = api.post.create.useMutation({
@@ -34,38 +35,32 @@ export default function CreatePost() {
       attributes: {
         class: 'prose outline-none outline'
       }
-    },
-    content: '<p>Hello World!</p>'
+    }
   });
   const [title, setTitle] = useState('');
   return (
     <Layout className='flex justify-center'>
       <div className='flex w-prose flex-col'>
-        <textarea
+        <BlankEditor
           placeholder='Title'
-          value={title}
-          rows={1}
-          className={`mb-8 h-auto resize-none overflow-y-hidden text-5xl font-extrabold outline-none outline ${
-            error ? 'text-red-700 placeholder:text-red-300' : ''
+          defaultContent={title}
+          className={`mb-8 text-5xl font-extrabold ${
+            error ? 'text-red-700' : ''
           }`}
-          onChange={(e) => {
-            if (error) {
-              setError(null);
-            }
-            e.target.style.height = 'auto';
-            e.target.style.height = `${e.target.scrollHeight}px`;
-            setTitle(e.target.value);
-          }}
-        />
-        <EditorContent
-          editor={editor}
           onKeyDown={(e) => {
             if (e.key === 'Enter') {
               e.preventDefault();
               editor?.chain().focus().run();
             }
           }}
+          onUpdate={(text) => {
+            if (error) {
+              setError(null);
+            }
+            setTitle(text);
+          }}
         />
+        <EditorContent editor={editor} />
         <SubmitButton
           className='mt-8 mb-4 self-start'
           onClick={() => {
