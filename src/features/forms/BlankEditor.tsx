@@ -6,10 +6,10 @@ import Placeholder from '@tiptap/extension-placeholder';
 import type { KeyboardEventHandler } from 'react';
 export default function BlankEditor({
   defaultContent = '',
-  onUpdate = () => {},
+  onUpdate,
   className = '',
   placeholder = '',
-  onKeyDown = () => {}
+  onKeyDown
 }: {
   defaultContent?: string;
   onUpdate?: (text: string) => void;
@@ -30,7 +30,7 @@ export default function BlankEditor({
     ],
     content: defaultContent,
     onUpdate: ({ editor }) => {
-      onUpdate(editor.getText());
+      onUpdate?.(editor.getText());
     },
     editorProps: {
       attributes: {
