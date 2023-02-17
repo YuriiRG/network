@@ -9,7 +9,7 @@ import { useForm } from 'react-hook-form';
 import { api } from '../utils/api';
 import Router from 'next/router';
 import ErrorsBlock from '../features/forms/ErrorsBlock';
-import { IconLoader2 } from '@tabler/icons-react';
+import IconLoader2 from '../components/icons/IconLoader2';
 
 export const signUpSchema = z.object({
   name: z

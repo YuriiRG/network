@@ -1,8 +1,7 @@
 import Head from 'next/head';
 import Router from 'next/router';
-import type { SubmitHandler } from 'react-hook-form';
 import { useForm } from 'react-hook-form';
-import { IconLoader2 } from '@tabler/icons-react';
+import IconLoader2 from '../components/icons/IconLoader2';
 import Layout from '../components/Layout';
 import { api } from '../utils/api';
 import TextInput from '../features/forms/TextInput';

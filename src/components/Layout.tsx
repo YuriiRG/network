@@ -1,4 +1,4 @@
-import { IconUserCircle } from '@tabler/icons-react';
+import IconUserCircle from '../components/icons/IconUserCircle';
 import Link from 'next/link';
 import type { ReactNode } from 'react';
 import NavLink from '../features/layout/NavLink';
