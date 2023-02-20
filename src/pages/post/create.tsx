@@ -52,6 +52,10 @@ export default function CreatePost() {
   useEffect(() => {
     localStorage.setItem('title', title);
   }, [title]);
+  if (error) {
+    console.log('if error: yes');
+    console.log(error);
+  }
   return (
     <Layout className='flex justify-center'>
       <div className='flex w-prose flex-col'>
@@ -68,9 +72,7 @@ export default function CreatePost() {
             }
           }}
           onUpdate={(text) => {
-            if (error) {
-              setError(null);
-            }
+            setError(null);
             setTitle(text);
           }}
         />
