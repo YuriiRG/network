@@ -1,6 +1,6 @@
-import { IconUserCircle } from '@tabler/icons';
+import IconUserCircle from '../components/icons/IconUserCircle';
 import Link from 'next/link';
-import { ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import NavLink from '../features/layout/NavLink';
 import { api } from '../utils/api';
 
@@ -14,8 +14,8 @@ export default function Layout({
   const { data } = api.auth.getUser.useQuery();
   const utils = api.useContext();
   const signOut = api.auth.signOut.useMutation({
-    onSuccess: () => {
-      utils.auth.invalidate();
+    onSuccess: async () => {
+      await utils.auth.invalidate();
     }
   });
   return (

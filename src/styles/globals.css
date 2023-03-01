@@ -2,6 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
-.flex > * {
+.flex:not(.flex-col) > * {
   min-width: 0;
+}
+
+.ProseMirror p.is-editor-empty:first-child::before {
+  @apply pointer-events-none float-left h-0 text-gray-400 content-[attr(data-placeholder)];
 }

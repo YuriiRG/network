@@ -9,7 +9,7 @@ import { useForm } from 'react-hook-form';
 import { api } from '../utils/api';
 import Router from 'next/router';
 import ErrorsBlock from '../features/forms/ErrorsBlock';
-import { IconLoader2 } from '@tabler/icons';
+import IconLoader2 from '../components/icons/IconLoader2';
 
 export const signUpSchema = z.object({
   name: z
@@ -38,10 +38,10 @@ export default function SignUp() {
 
   const { mutate: signInMutate, isLoading: signInLoading } =
     api.auth.signIn.useMutation({
-      onSuccess: (data) => {
+      onSuccess: async (data) => {
         if (data.success) {
-          utils.auth.invalidate();
-          Router.push('/');
+          await utils.auth.invalidate();
+          await Router.push('/');
         } else if (data.success === false) {
           setError(data.errorField, { message: data.errorMessage });
         }
@@ -74,9 +74,9 @@ export default function SignUp() {
       <Layout className='flex justify-center'>
         <form
           className='mt-4 flex w-72 flex-col gap-6'
-          onSubmit={handleSubmit((data) => {
-            signUpMutate({ ...data });
-          })}
+          onSubmit={(e) =>
+            void handleSubmit((data) => signUpMutate({ ...data }))(e)
+          }
         >
           <h1 className='text-4xl font-bold'>Sign Up</h1>
           <TextInput

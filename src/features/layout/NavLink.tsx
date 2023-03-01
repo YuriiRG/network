@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { ReactNode } from 'react';
+import type { ReactNode } from 'react';
 
 export default function NavLink(props: { href: string; children: ReactNode }) {
   const { pathname } = useRouter();
