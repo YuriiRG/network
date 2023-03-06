@@ -3,9 +3,17 @@ import { z } from 'zod';
 import { router, procedure } from '../trpc';
 import { Prisma } from '@prisma/client';
 export const postRouter = router({
-  all: procedure.query(async ({ ctx }) => {
-    return await ctx.prisma.post.findMany();
-  }),
+  getNew: procedure
+    .input(z.object({ length: z.number(), page: z.number() }))
+    .query(async ({ input, ctx }) => {
+      return await ctx.prisma.post.findMany({
+        skip: input.length * input.page,
+        take: input.length,
+        orderBy: {
+          publishedAt: 'desc'
+        }
+      });
+    }),
   read: procedure
     .input(z.string().uuid())
     .query(async ({ ctx, input: postId }) => {
