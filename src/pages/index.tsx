@@ -25,11 +25,23 @@ export default function Home() {
         className={`block w-max rounded-lg border-2 border-blue-700 px-4 py-2 text-blue-700
           hover:border-blue-800 hover:text-blue-800`}
       >
-        Create a new post
+        New post
       </Link>
-      {posts.map(({ title, id }) => (
-        <div key={id}>{title}</div>
-      ))}
+      <div className='flex justify-center'>
+        <div className='flex w-prose flex-col gap-2'>
+          {posts.map(({ title, id, author }) => (
+            <div key={id} className='rounded-lg border bg-gray-100 p-2 text-sm'>
+              <div className='self-end'>by {author.name}</div>
+              <Link
+                href={`/post/${id}`}
+                className='block text-lg font-semibold'
+              >
+                {title}
+              </Link>
+            </div>
+          ))}
+        </div>
+      </div>
     </Layout>
   );
 }

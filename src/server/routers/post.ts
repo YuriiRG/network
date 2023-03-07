@@ -11,6 +11,9 @@ export const postRouter = router({
         take: input.length,
         orderBy: {
           publishedAt: 'desc'
+        },
+        include: {
+          author: true
         }
       });
     }),
