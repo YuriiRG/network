@@ -27,7 +27,7 @@ export default function Home() {
       >
         New post
       </Link>
-      <div className='flex justify-center'>
+      <div className='mt-2 flex justify-center'>
         <div className='flex w-prose flex-col gap-2'>
           {posts.map(({ title, id, author }) => (
             <div key={id} className='rounded-lg border bg-gray-100 p-2 text-sm'>
