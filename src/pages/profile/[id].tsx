@@ -4,6 +4,7 @@ import { z } from 'zod';
 import Layout from '../../components/Layout';
 import { createSSRHelpers } from '../../server/helpers/ssr';
 import { api } from '../../utils/api';
+import { day } from '../../utils/dayjs';
 
 export default function Profile() {
   const router = useRouter();
@@ -27,7 +28,17 @@ export default function Profile() {
   if (data === null) {
     return <Layout>Post doesn&apos;t exist</Layout>;
   }
-  return <Layout>{data.name}</Layout>;
+  return (
+    <Layout>
+      <h1>{data.name}</h1>
+      <p>
+        registered{' '}
+        <span title={day(data.registeredAt).format('LLLL')}>
+          {day(data.registeredAt).fromNow()}
+        </span>
+      </p>
+    </Layout>
+  );
 }
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
