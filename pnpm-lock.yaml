@@ -27,6 +27,7 @@ specifiers:
   '@typescript-eslint/parser': ^5.52.0
   autoprefixer: ^10.4.13
   bcryptjs: ^2.4.3
+  dayjs: ^1.11.7
   eslint: 8.34.0
   eslint-config-next: 13.1.6
   isomorphic-dompurify: ^0.27.0
@@ -63,6 +64,7 @@ dependencies:
   '@trpc/react-query': 10.11.0_dcakzkhtr7lfnhwqu5kskkvph4
   '@trpc/server': 10.11.0
   bcryptjs: 2.4.3
+  dayjs: 1.11.7
   isomorphic-dompurify: 0.27.0
   next: 13.1.6_biqbaboplfbrettd7655fr4n2y
   react: 18.2.0
@@ -1302,6 +1304,10 @@ packages:
       abab: 2.0.6
       whatwg-mimetype: 3.0.0
       whatwg-url: 11.0.0
+    dev: false
+
+  /dayjs/1.11.7:
+    resolution: {integrity: sha512-+Yw9U6YO5TQohxLcIkrXBeY73WP3ejHWVvx8XCk3gxvQDCTEmS48ZrSZCKciI7Bhl/uCMyxYtE9UqRILmFphkQ==}
     dev: false
 
   /debug/3.2.7:
