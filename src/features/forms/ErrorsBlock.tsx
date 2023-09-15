@@ -1,4 +1,4 @@
-export default function ErrosBlock({
+export default function ErrorsBlock({
   errors
 }: {
   errors: readonly (string | undefined)[];
