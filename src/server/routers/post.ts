@@ -1,31 +1,29 @@
 import { TRPCError } from '@trpc/server';
 import { z } from 'zod';
 import { router, procedure } from '../trpc';
-import { Prisma } from '@prisma/client';
+import { DrizzleError, desc } from 'drizzle-orm';
+import { posts } from '../../db/schema';
+import postgres from 'postgres'; // don't use named imports, they are wrong
+const { PostgresError } = postgres;
+
 export const postRouter = router({
   getNew: procedure
     .input(z.object({ length: z.number(), page: z.number() }))
     .query(async ({ input, ctx }) => {
-      return await ctx.prisma.post.findMany({
-        skip: input.length * input.page,
-        take: input.length,
-        orderBy: {
-          publishedAt: 'desc'
-        },
-        include: {
+      return await ctx.db.query.posts.findMany({
+        offset: input.length * input.page,
+        limit: input.length,
+        orderBy: [desc(posts.id)],
+        with: {
           author: true
         }
       });
     }),
-  read: procedure
-    .input(z.string().uuid())
-    .query(async ({ ctx, input: postId }) => {
-      return await ctx.prisma.post.findFirst({
-        where: {
-          id: postId
-        }
-      });
-    }),
+  read: procedure.input(z.number()).query(async ({ ctx, input: postId }) => {
+    return await ctx.db.query.posts.findFirst({
+      where: (posts, { eq }) => eq(posts.id, postId)
+    });
+  }),
   create: procedure
     .input(
       z.object({
@@ -38,22 +36,18 @@ export const postRouter = router({
         throw new TRPCError({ code: 'UNAUTHORIZED' });
       }
       try {
-        const { id } = await ctx.prisma.post.create({
-          data: {
+        const [{ id }] = await ctx.db
+          .insert(posts)
+          .values({
             title: input.title,
             content: input.content,
             authorId: ctx.session.userId
-          },
-          select: {
-            id: true
-          }
-        });
+          })
+          .returning();
         return id;
       } catch (e) {
-        if (e instanceof Prisma.PrismaClientKnownRequestError) {
-          if (e.code === 'P2002') {
-            throw new TRPCError({ code: 'CONFLICT' });
-          }
+        if (e instanceof PostgresError && e.code === '23505') {
+          throw new TRPCError({ code: 'CONFLICT' });
         }
         throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' });
       }

@@ -1,58 +1,49 @@
-import type { Session } from '@prisma/client';
+import { sessions, type users } from '../db/schema';
 import type { CreateNextContextOptions } from '@trpc/server/adapters/next';
 import type { GetServerSidePropsContext } from 'next';
 import { getClientIp } from 'request-ip';
-import { prisma } from './db';
+import { db } from '../db';
+import { eq } from 'drizzle-orm';
 
 type CreateInnerContextOptions =
   | GetServerSidePropsContext
   | CreateNextContextOptions;
 
 export async function createContext(opts: CreateInnerContextOptions): Promise<{
-  prisma: typeof prisma;
+  db: typeof db;
   session:
-    | (Session & {
-        user: {
-          id: string;
-          name: string;
-          about: string | null;
-          registeredAt: Date;
-        };
+    | ((typeof sessions)['$inferSelect'] & {
+        user: Omit<(typeof users)['$inferSelect'], 'passwordHash'>;
       })
     | null;
   req: CreateInnerContextOptions['req'];
   res: CreateInnerContextOptions['res'];
 }> {
-  const sessionId = opts.req.cookies.sessionId;
+  const sessionId = Number(opts.req.cookies.sessionId);
 
   const result: Context = {
-    prisma,
+    db,
     session: null,
     req: opts.req,
     res: opts.res
   };
 
-  if (!sessionId) {
+  if (isNaN(sessionId)) {
     return result;
   }
 
-  let session = await prisma.session.findFirst({
-    where: {
-      id: sessionId
-    },
-    include: {
+  const session = await db.query.sessions.findFirst({
+    where: (sessions, { eq }) => eq(sessions.id, sessionId),
+    with: {
       user: {
-        select: {
-          id: true,
-          name: true,
-          about: true,
-          registeredAt: true
+        columns: {
+          passwordHash: false
         }
       }
     }
   });
 
-  if (session === null) {
+  if (session === undefined) {
     return result;
   }
 
@@ -60,34 +51,20 @@ export async function createContext(opts: CreateInnerContextOptions): Promise<{
     new Date(session.createdAt.getTime() + 1000 * 60 * 60 * 24 * 30) <
     new Date()
   ) {
-    await prisma.session.delete({
-      where: {
-        id: sessionId
-      }
-    });
+    await db.delete(sessions).where(eq(sessions.id, sessionId));
+
     return result;
   }
 
-  session = await prisma.session.update({
-    where: {
-      id: sessionId
-    },
-    data: {
+  await db
+    .update(sessions)
+    .set({
       lastActivity: new Date(),
       userAgent: opts.req.headers['user-agent'] ?? null,
       ipAddress: getClientIp(opts.req)
-    },
-    include: {
-      user: {
-        select: {
-          id: true,
-          name: true,
-          about: true,
-          registeredAt: true
-        }
-      }
-    }
-  });
+    })
+    .where(eq(sessions.id, sessionId));
+
   result.session = session;
   return result;
 }

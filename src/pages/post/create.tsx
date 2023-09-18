@@ -52,10 +52,7 @@ export default function CreatePost() {
   useEffect(() => {
     localStorage.setItem('title', title);
   }, [title]);
-  if (error) {
-    console.log('if error: yes');
-    console.log(error);
-  }
+
   return (
     <Layout className='flex justify-center'>
       <div className='flex w-prose flex-col'>
@@ -78,7 +75,7 @@ export default function CreatePost() {
         />
         <EditorContent editor={editor} />
         <SubmitButton
-          className='mt-8 mb-4 self-start'
+          className='mb-4 mt-8 self-start'
           onClick={() => {
             mutate({ content: editor?.getHTML() ?? '', title });
           }}
